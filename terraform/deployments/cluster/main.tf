@@ -32,7 +32,7 @@ terraform {
 
 # Call the network module to set up VPC, subnets, etc.
 module "network" {
-  source = "git::https://github.com/sparx-general/terraform-network-module.git?ref=v1.0.0"
+  source = "git::https://github.com/org-name/terraform-network-module.git?ref=v1.0.0"
 
   environment        = local.environment
   project_name       = var.project_name
@@ -43,7 +43,7 @@ module "network" {
 }
 
 module "ecs_container_asg_alb" {
-  source = "git::https://github.com/sparx-general/terraform-compute-module.git?ref=v1.0.0"
+  source = "git::https://github.com/org-name/terraform-compute-module.git?ref=v1.0.0"
 
   environment          = local.environment
   project_name         = var.project_name
@@ -61,7 +61,7 @@ module "ecs_container_asg_alb" {
 
 # Call the security group module for common security groups.
 module "common_security_groups" {
-  source = "git::https://github.com/sparx-general/terraform-security-group-module.git?ref=v1.0.0"
+  source = "git::https://github.com/org-name/terraform-security-group-module.git?ref=v1.0.0"
 
   vpc_id      = module.network.vpc_id
   project_name = var.project_name
@@ -70,14 +70,14 @@ module "common_security_groups" {
 
 # Call the ECS cluster module to create the ECS cluster resource.
 module "ecs_cluster" {
-  source = "git::https://github.com/sparx-general/terraform-ecs-cluster-module.git?ref=v1.0.0"
+  source = "git::https://github.com/org-name/terraform-ecs-cluster-module.git?ref=v1.0.0"
 
   project_name = var.project_name
   environment  = local.environment
 }
 
 module "github_provider" {
-  source = "git::https://github.com/sparx-general/terraform-github-oidc-provider-module.git?ref=v1.0.0"
+  source = "git::https://github.com/org-name/terraform-github-oidc-provider-module.git?ref=v1.0.0"
 
   project_name = var.project_name
   environment = local.environment

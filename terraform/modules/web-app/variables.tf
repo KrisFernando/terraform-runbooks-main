@@ -39,6 +39,11 @@ variable "ecs_cluster_name" {
   type        = string
 }
 
+variable "alb_port" {
+  description = "The port on the load balancer that the application listens on."
+  type        = number
+}
+
 variable "alb_security_group_id" {
   description = "The ID of the security group for the Application Load Balancer."
   type        = string

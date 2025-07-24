@@ -32,20 +32,21 @@ terraform {
 
 # Deploy a specific web application within the created ECS environment.
 module "web_app" {
-  source = "../modules/application/web-app-1"
+  source = "git::https://github.com/org-name/terraform-web-app-module.git?ref=v1.0.0"
 
-  app_name                     = var.app_name
-  environment                  = local.environment
-  aws_region                   = var.aws_region
-  vpc_id                       = local.vpc_id
-  public_subnet_ids            = local.public_subnet_ids
-  private_subnet_ids           = local.private_subnet_ids
-  ecs_cluster_id               = local.cluster_id
+  app_name                     = var.app_name 
+  environment                  = local.environment 
+  aws_region                   = var.aws_region 
+  vpc_id                       = local.vpc_id 
+  public_subnet_ids            = local.public_subnet_ids 
+  private_subnet_ids           = local.private_subnet_ids 
+  ecs_cluster_id               = local.ecs_cluster_id 
   ecs_cluster_name             = local.ecs_cluster_name
   alb_security_group_id        = local.alb_security_group_id
-  app_security_group_id        = local.ecs_task_security_group_id
+  app_security_group_id        = local.app_security_group_id
   image_tag                    = "latest" # Or a specific version
   desired_count                = 1
+  alb_port                     = 80
   container_port               = 80
   health_check_path            = "/health"
   cpu                          = 256 # Fargate CPU units
@@ -59,7 +60,7 @@ module "web_app" {
 
 # Deploy GitHub OIDC role for CI/CD access (e.g., to push ECR images)
 module "github_oidc_role" {
-  source = "git::https://github.com/sparx-general/terraform-github-oidc-iam-role-module.git?ref=v1.0.0"
+  source = "git::https://github.com/org-name/terraform-github-oidc-iam-role-module.git?ref=v1.0.0"
 
   environment          = local.environment
   project_name         = var.project_name

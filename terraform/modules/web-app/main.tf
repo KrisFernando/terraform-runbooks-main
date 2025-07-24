@@ -71,7 +71,6 @@ resource "aws_ecs_task_definition" "app_task" {
   family                   = "${var.app_name}-${var.environment}"
   cpu                      = var.cpu
   memory                   = var.memory
-  network_mode             = "awsvpc" # Required for Fargate
   requires_compatibilities = ["EC2"]
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_role.arn
@@ -86,7 +85,7 @@ resource "aws_ecs_task_definition" "app_task" {
       portMappings = [
         {
           containerPort = var.container_port
-          hostPort      = var.container_port
+          hostPort      = 0
           protocol      = "tcp"
         }
       ]
@@ -114,7 +113,7 @@ resource "aws_cloudwatch_log_group" "app_log_group" {
   retention_in_days = 7 # Adjust as needed
 
   tags = {
-    Name        = "${var.app_name}-log-group"
+    Name        = "log-group-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -133,13 +132,13 @@ resource "aws_lb" "app_alb" {
   }
 }
 
-# ALB Target Group
+# ALB Target Group 
 resource "aws_lb_target_group" "app_tg" {
   name        = "tg-${var.app_name}-${var.environment}"
-  port        = var.container_port
+  port        = var.alb_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
-  target_type = "ip" 
+  target_type = "instance" 
 
   health_check {
     path                = var.health_check_path
@@ -152,7 +151,7 @@ resource "aws_lb_target_group" "app_tg" {
   }
 
   tags = {
-    Name        = "tg--${var.app_name}-${var.environment}"
+    Name        = "tg-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -160,7 +159,7 @@ resource "aws_lb_target_group" "app_tg" {
 # ALB Listener (HTTP on port 80)
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app_alb.arn
-  port              = "80"
+  port              = var.alb_port
   protocol          = "HTTP"
 
   default_action {
@@ -182,12 +181,6 @@ resource "aws_ecs_service" "app_service" {
   desired_count   = var.desired_count
   launch_type     = "EC2"
 
-  network_configuration {
-    subnets         = var.private_subnet_ids # Tasks run in private subnets
-    security_groups = [var.app_security_group_id] # SG for the ECS tasks
-    assign_public_ip = false # Tasks should not have public IPs
-  }
-
   load_balancer {
     target_group_arn = aws_lb_target_group.app_tg.arn
     container_name   = var.app_name
@@ -202,7 +195,7 @@ resource "aws_ecs_service" "app_service" {
 
   # Optional: Deployment controller type
   deployment_controller {
-    type = "ECS" # Or CODE_DEPLOY, EXTERNAL
+    type = "ECS" 
   }
 
   tags = {
