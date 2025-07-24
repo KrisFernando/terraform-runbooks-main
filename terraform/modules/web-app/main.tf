@@ -4,22 +4,22 @@
 
 # ECR Repository for the application images
 resource "aws_ecr_repository" "app_repo" {
-  name                 = "${var.environment}/${var.app_name}" # e.g., non-prod/web-app-1
-  image_tag_mutability = "MUTABLE" # Or IMMUTABLE for production best practices
+  name                 = "ecr-${var.app_name}-${var.environment}" 
+  image_tag_mutability = "IMMUTABLE" 
 
   image_scanning_configuration {
     scan_on_push = true
   }
 
   tags = {
-    Name        = "${var.app_name}-ecr"
+    Name        = "ecr-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
 
 # IAM Role for ECS Task Execution (Fargate requires this for logging, ECR pull, etc.)
 resource "aws_iam_role" "ecs_task_execution_role" {
-  name = "${var.app_name}-ecs-task-execution-role-${var.environment}"
+  name = "ecs-task-execution-role-${var.app_name}-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -42,7 +42,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
 
 # IAM Role for ECS Task (if your application needs AWS permissions, e.g., S3 access)
 resource "aws_iam_role" "ecs_task_role" {
-  name = "${var.app_name}-ecs-task-role-${var.environment}"
+  name = "ecs-task-role-${var.app_name}-${var.environment}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -72,9 +72,9 @@ resource "aws_ecs_task_definition" "app_task" {
   cpu                      = var.cpu
   memory                   = var.memory
   network_mode             = "awsvpc" # Required for Fargate
-  requires_compatibilities = ["FARGATE"] # Or ["EC2"]
+  requires_compatibilities = ["EC2"]
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  task_role_arn            = aws_iam_role.ecs_task_role.arn # Optional, if your app needs AWS permissions
+  task_role_arn            = aws_iam_role.ecs_task_role.arn
 
   container_definitions = jsonencode([
     {
@@ -103,7 +103,7 @@ resource "aws_ecs_task_definition" "app_task" {
   ])
 
   tags = {
-    Name        = "${var.app_name}-task-def"
+    Name        = "task-def-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -121,25 +121,25 @@ resource "aws_cloudwatch_log_group" "app_log_group" {
 
 # Application Load Balancer
 resource "aws_lb" "app_alb" {
-  name               = "${var.app_name}-${var.environment}-alb"
+  name               = "alb-${var.app_name}-${var.environment}"
   internal           = false # Public-facing ALB for websites
   load_balancer_type = "application"
   security_groups    = [var.alb_security_group_id] # Security group for ALB
   subnets            = var.public_subnet_ids # ALB needs to be in public subnets
 
   tags = {
-    Name        = "${var.app_name}-alb"
+    Name        = "alb-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
 
 # ALB Target Group
 resource "aws_lb_target_group" "app_tg" {
-  name        = "${var.app_name}-${var.environment}-tg"
+  name        = "tg-${var.app_name}-${var.environment}"
   port        = var.container_port
   protocol    = "HTTP"
   vpc_id      = var.vpc_id
-  target_type = "ip" # For Fargate
+  target_type = "ip" 
 
   health_check {
     path                = var.health_check_path
@@ -152,7 +152,7 @@ resource "aws_lb_target_group" "app_tg" {
   }
 
   tags = {
-    Name        = "${var.app_name}-tg"
+    Name        = "tg--${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
@@ -169,21 +169,21 @@ resource "aws_lb_listener" "http" {
   }
 
   tags = {
-    Name        = "${var.app_name}-alb-listener-http"
+    Name        = "alb-listener-http-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 }
 
 # ECS Service
 resource "aws_ecs_service" "app_service" {
-  name            = "${var.app_name}-${var.environment}-service"
+  name            = "ecs-service-${var.app_name}-${var.environment}"
   cluster         = var.ecs_cluster_id
   task_definition = aws_ecs_task_definition.app_task.arn
   desired_count   = var.desired_count
-  launch_type     = "FARGATE" # Or "EC2"
+  launch_type     = "EC2"
 
   network_configuration {
-    subnets         = var.private_subnet_ids # Fargate tasks run in private subnets
+    subnets         = var.private_subnet_ids # Tasks run in private subnets
     security_groups = [var.app_security_group_id] # SG for the ECS tasks
     assign_public_ip = false # Tasks should not have public IPs
   }
@@ -206,7 +206,7 @@ resource "aws_ecs_service" "app_service" {
   }
 
   tags = {
-    Name        = "${var.app_name}-service"
+    Name        = "ecs-service-${var.app_name}-${var.environment}"
     Environment = var.environment
   }
 
