@@ -1,4 +1,4 @@
-# modules/compute/asg-alb/main.tf
+# modules/compute/main.tf
 # This module creates an Application Load Balancer (ALB) and an Auto Scaling Group (ASG)
 # for EC2 instances, typically used for hosting applications that are not ECS Fargate tasks.
 

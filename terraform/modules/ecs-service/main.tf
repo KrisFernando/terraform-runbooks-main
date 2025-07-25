@@ -1,4 +1,4 @@
-# modules/application/web-app-1/main.tf
+# modules/ecs-service/main.tf
 # This module defines the resources for a specific web application,
 # including ECR, ECS Task Definition, ECS Service, and an ALB.
 

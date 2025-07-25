@@ -1,4 +1,4 @@
-# runbooks/cluster/main.tf
+# runbooks/service/main.tf
 # This module orchestrates the deployment of a complete ECS environment,
 # including VPC, subnets, internet gateway, NAT gateways, security groups,
 # the ECS cluster itself, and optionally Auto Scaling Group/Load Balancer
@@ -31,7 +31,7 @@ terraform {
 }
 
 # Deploy a specific web application within the created ECS environment.
-module "web_app" {
+module "ecs_service" {
   source = "git::https://github.com/org-name/terraform-web-app-module.git?ref=v1.0.0"
 
   app_name                     = var.app_name 
