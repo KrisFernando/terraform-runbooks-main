@@ -4,20 +4,20 @@
 
 - project_name: string | ex. "project-name"
 - environment: string | ex. "dev"
-- vpc_id
-- public_subnet_ids
-- private_subnet_ids
-- cluster_id
-- cluster_name
-- alb_port
-- alb_security_group_id
-- app_security_group_id
-- image_tag
-- desired_count
-- container_port
-- health_check_path
-- cpu
-- memory
+- vpc_id: string | ex. "id"
+- public_subnet_ids: string array | ex. ["id", "id"]
+- private_subnet_ids: string array | ex. ["id", "id"]
+- cluster_id: string | ex. "id"
+- cluster_name: string | ex. "cluster"
+- alb_port: integer | ex. 80
+- alb_security_group_id: string | ex. "id"
+- app_security_group_id: string | ex. "id"
+- image_tag: string | ex. "id"
+- desired_count: integer | ex. 3
+- container_port: integer | ex. 80
+- health_check_path: string | ex. "/ecs-health"
+- cpu: integer | ex. 1
+- memory: integer | ex. 2
 - container_environment_variables
 
 ## Output Variables
