@@ -9,11 +9,6 @@ variable "environment" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "AWS region for the deployment."
-  type        = string
-}
-
 variable "vpc_id" {
   description = "The ID of the VPC where the application will be deployed."
   type        = string
