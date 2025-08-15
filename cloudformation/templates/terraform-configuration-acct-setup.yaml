@@ -85,6 +85,12 @@ Resources:
           - Effect: Allow
             Action: "*"
             Resource: "*"
+          - Effect: Allow
+            Action: sts:AssumeRole
+            Resource:
+              - 'arn:aws:iam::111122223333:role/TerraformDeploymentRole'
+              - 'arn:aws:iam::444455556666:role/TerraformDeploymentRole'
+              - 'arn:aws:iam::777788889999:role/TerraformDeploymentRole'
       Users:
         - !Ref TerraformUser
 
