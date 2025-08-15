@@ -7,7 +7,7 @@
 # Define the AWS provider for this deployment.
 # The region variable would be set via CLI, environment variable, or a .tfvars file.
 provider "aws" {
-  region = var.aws_region
+  region = local.region
 }
 
 # Configure the Terraform remote backend for state management.
@@ -24,7 +24,7 @@ terraform {
   backend "s3" {
     bucket         = "tf-configuration-statefiles-2025-07-04-xasdf" # Dynamic bucket name based on environment
     key            = "cluster/cluster-tf-state-file.tfstate"
-    region         = "us-east-1" # State bucket region (can be different from resource region)
+    region         = local.region # Dynamic region based on environment # State bucket region (can be different from resource region)
     encrypt        = true
     use_lockfile = true
   }
@@ -36,10 +36,10 @@ module "network" {
 
   environment        = local.environment
   project_name       = var.project_name
-  vpc_cidr_block     = var.vpc_cidr_block
-  public_subnets     = var.public_subnets
-  private_subnets    = var.private_subnets
-  availability_zones = var.availability_zones
+  vpc_cidr_block     = local.cidr_block
+  public_subnets     = local.public_subnets
+  private_subnets    = local.private_subnets
+  availability_zones = local.availability_zones
 }
 
 module "ecs_container_asg_alb" {
@@ -51,10 +51,10 @@ module "ecs_container_asg_alb" {
   subnet_ids           = module.network.private_subnet_ids # Or public, depending on architecture
   alb_security_group_id = module.common_security_groups.alb_security_group_id
   instance_security_group_ids = [module.common_security_groups.ecs_task_security_group_id] # Example SG output
-  instance_type        = var.ecs_instance_type
-  desired_capacity     = var.ecs_desired_capacity
-  max_size             = var.ecs_max_size
-  min_size             = var.ecs_min_size
+  instance_type        = local.instance_type
+  desired_capacity     = local.desired_capacity
+  max_size             = local.max_size
+  min_size             = local.min_size
   health_check_path    = "/ecs-health" # Health check for ECS agent
   container_port       = 80 # Or relevant port for ECS agent
 }
