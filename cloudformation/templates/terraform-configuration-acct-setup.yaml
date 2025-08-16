@@ -4,12 +4,12 @@ Description: "CloudFormation template to create S3 bucket, IAM user, and policie
 Parameters:
   BucketName:
     Type: String
-    Default: "tf-configuration-statefiles-2025-07-04-xasdf"
+    Default: "s3-configuration-statefiles-2025-07-04"
     Description: "S3 bucket name for Terraform state (must be globally unique)"
 
   TerraformUserName:
     Type: String
-    Default: "terraform-user"
+    Default: "iam-user-terraform"
     Description: "IAM user name for Terraform operations"
 
 Resources:
@@ -55,7 +55,7 @@ Resources:
   TerraformS3Policy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub "${TerraformUserName}-s3-policy"
+      PolicyName: "iam-policy-terraform-s3"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -78,13 +78,10 @@ Resources:
   TerraformAdminPolicy:
     Type: AWS::IAM::Policy
     Properties:
-      PolicyName: !Sub "${TerraformUserName}-admin-policy"
+      PolicyName: "iam-policy-terraform-assume-role"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Effect: Allow
-            Action: "*"
-            Resource: "*"
           - Effect: Allow
             Action: sts:AssumeRole
             Resource:

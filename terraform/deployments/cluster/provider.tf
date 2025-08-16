@@ -9,7 +9,7 @@ provider "aws" {
   alias = "dev"
   region = local.region
   assume_role {
-    role_arn = "arn:aws:iam::111122223333:role/TerraformDeploymentRole"
+    role_arn = "arn:aws:iam::111122223333:role/iam-policy-terraform-assume-role"
   }
 }
 
@@ -18,6 +18,6 @@ provider "aws" {
   alias = "qa"
   region = local.region
   assume_role {
-    role_arn = "arn:aws:iam::444455556666:role/TerraformDeploymentRole"
+    role_arn = "arn:aws:iam::444455556666:role/iam-policy-terraform-assume-role"
   }
 }
